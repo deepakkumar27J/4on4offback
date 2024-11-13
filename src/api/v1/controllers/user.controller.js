@@ -46,10 +46,26 @@ const deleteUser = async(req,res) => {
     }
 }
 
+const getUserRota = async(req, res) => {
+    try {
+        console.log("we are in the club", req.params.userId);
+        const user = await userService.getUserById(req.params.userId);
+        if(!user){
+            return res.status(404).json({message: "User not found"});
+        }
+        const rota = await userService.calculateRota(user.startDate, user.holidays, req.params.rangeStartDate, req.params.rangeEndDate);
+        console.log("rota -- ", rota);
+        res.json(rota);
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
 module.exports= {
     createUser,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    getUserRota
 
 }
