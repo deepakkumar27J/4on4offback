@@ -63,6 +63,17 @@ const calculateRota = async(startDate, holidays = [], rangeStartDate, rangeEndDa
     }
     return rota;
 }
+
+const addHoliday = async (userId, holidays) => {
+    const user = await User.findById(userId);
+    holidays.forEach(holiday => {
+        user.holidays.push(holiday);
+    });
+    user.save();
+    return user;
+}
+
+
 // TO-DO setup alarm based on rota
 
 module.exports = {
@@ -70,5 +81,6 @@ module.exports = {
     getUserById,
     updateUser,
     deleteUser,
-    calculateRota
+    calculateRota,
+    addHoliday
 }
