@@ -67,10 +67,16 @@ const calculateRota = async(startDate, holidays = [], rangeStartDate, rangeEndDa
 const addHoliday = async (userId, holidays) => {
     const user = await User.findById(userId);
     holidays.forEach(holiday => {
+        let partsCurrent = holiday.split('-');  // Split into day, month, and year
+        holiday = `${partsCurrent[2]}-${partsCurrent[1]}-${partsCurrent[0]}`;
         user.holidays.push(holiday);
     });
     user.save();
     return user;
+}
+
+const getUserByEmail = async(email) => {
+   return await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
 }
 
 
@@ -82,5 +88,6 @@ module.exports = {
     updateUser,
     deleteUser,
     calculateRota,
-    addHoliday
+    addHoliday,
+    getUserByEmail
 }
