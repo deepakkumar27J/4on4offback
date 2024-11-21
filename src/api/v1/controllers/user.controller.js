@@ -71,15 +71,29 @@ const addHoliday = async(req,res) => {
     }
 }
 
-//TO-DO
-const updateHoliday = async(req,res) => {
+const getHoliday = async(req,res) => {
     try {
-        console.log("inside holiday update");
-        res.json({message:"UHolidays added successfully"});
+        const holidays = await userService.getHoliday(req.body.id);
+        if(!holidays){
+            return res.status(404).json({message: "User not found"});
+        }
+        res.json(holidays);
     } catch (error) {
         res.status(400).json({error: error.message});
     }
 }
+
+//TO-DO
+const updateHoliday = async(req,res) => {
+    try {
+        console.log("inside holiday update");
+        res.json({message:"Holidays added successfully"});
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+}
+
+
 
 module.exports= {
     createUser,
@@ -88,6 +102,7 @@ module.exports= {
     deleteUser,
     getUserRota,
     addHoliday,
-    updateHoliday
+    updateHoliday,
+    getHoliday
 
 }

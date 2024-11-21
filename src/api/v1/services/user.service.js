@@ -75,6 +75,11 @@ const addHoliday = async (userId, holidays) => {
     return user;
 }
 
+const holidays = async (userId) => {
+    const user = await User.findById(userId);
+    return user.holidays;
+}
+
 const getUserByEmail = async(email) => {
    return await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
 }
@@ -89,5 +94,6 @@ module.exports = {
     deleteUser,
     calculateRota,
     addHoliday,
-    getUserByEmail
+    getUserByEmail,
+    holidays
 }

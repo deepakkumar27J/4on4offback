@@ -8,6 +8,7 @@ router.get('/:id', userController.getUserById);
 router.delete('/:id', userController.deleteUser);
 router.get('/rota/:userId/:rangeStartDate/:rangeEndDate', userController.getUserRota);
 router.post('/holiday',userController.addHoliday);
+router.get('/holiday/:id',userController.getHoliday);
 
 
 module.exports = router;
