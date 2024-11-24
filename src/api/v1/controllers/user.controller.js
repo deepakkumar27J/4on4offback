@@ -1,4 +1,6 @@
 const userService = require('../services/user.service');
+const {sendEmail} = require('./../services/email.service');
+const crypto = require('crypto');
 
 const createUser = async(req,res) => {
     try {
@@ -93,6 +95,45 @@ const updateHoliday = async(req,res) => {
     }
 }
 
+const sendVerificationEmail = async(req, res) => {
+    try {
+        const {email} = req.body;
+        const user = await userService.getUserByEmail( email );
+        if (!user) {
+        return res.status(400).json({ message: 'User not found' });
+        }
+        // Generate random verification code
+        const verificationCode = crypto.randomBytes(3).toString('hex');
+        await userService.verificationCode(user, verificationCode);
+        
+        const subject = 'Verify Your Email Address';
+        const text = `Your verification code is: ${verificationCode}`;
+        const html = `<p>Your verification code is: <b>${verificationCode}</b></p>`;
+
+        await sendEmail(email, subject, text, html);
+        res.status(200).json({ message: 'Verification email sent.' });
+
+    } catch (error) {
+        console.error('Error in sendVerificationEmail:', error);
+        res.status(500).json({ message: 'Failed to send verification email.', error: error.message });
+    }
+}
+
+const verifyEmail = async(req, res) => {
+    try {
+        const { email, verificationCode } = req.body;
+
+        const user = await userService.getUserByEmail( email );
+        if (!user || user.verificationCode !== verificationCode) {
+        return res.status(400).json({ message: 'Invalid verification code.' });
+        }
+        await userService.verifyEmail(user);
+        res.status(200).json({ message: 'Email verified successfully.' });
+
+    } catch (error) {
+        
+    }
+}
 
 
 module.exports= {
@@ -103,6 +144,8 @@ module.exports= {
     getUserRota,
     addHoliday,
     updateHoliday,
-    getHoliday
+    getHoliday,
+    sendVerificationEmail,
+    verifyEmail
 
 }

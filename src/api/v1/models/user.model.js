@@ -19,7 +19,9 @@ const UserSchema = new mongoose.Schema({
     googleId: { type: String },
     startDate: { type: Date, required: true },
     holidays: [{ type: Date }],
-    createdAt: {type: Date, default: Date.now}
+    createdAt: {type: Date, default: Date.now},
+    verificationCode: { type: String },
+    isEmailVerified: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('User', UserSchema);

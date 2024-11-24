@@ -86,6 +86,16 @@ const getUserByEmail = async(email) => {
    return await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
 }
 
+const verifyEmail = async(user)=> {
+    user.isEmailVerified = true;
+    user.verificationCode = null;
+    await user.save();
+}
+
+const verificationCode = async(user, verificationCode) => {
+    user.verificationCode = verificationCode;
+    await user.save();
+}
 
 // TO-DO setup alarm based on rota
 
@@ -97,5 +107,7 @@ module.exports = {
     calculateRota,
     addHoliday,
     getUserByEmail,
-    holidays
+    holidays,
+    verifyEmail,
+    verificationCode
 }
