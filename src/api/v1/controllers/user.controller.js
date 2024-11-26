@@ -1,6 +1,9 @@
 const userService = require('../services/user.service');
 const {sendEmail} = require('./../services/email.service');
+const Token = require('./../models/token.model');
+const tokenService = require('./../services/token.service');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 const createUser = async(req,res) => {
     try {
@@ -135,6 +138,60 @@ const verifyEmail = async(req, res) => {
     }
 }
 
+const forgotPassword = async(req,res) => {
+    try {
+        const { email } = req.body;
+        const user = await userService.getUserByEmail(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        console.log("user ", user._id);
+        // Reset token
+        const resetToken = crypto.randomBytes(32).toString('hex');
+        await tokenService.createToken(user._id, resetToken)
+
+        const resetLink = `${process.env.FORGOT_PASS}${resetToken}`;
+        const subject = 'Password Reset Request';
+        const text =  `You requested a password reset. Click the link to reset your password: ${resetLink}`;
+        const html = `<p>Click the link to reset your password: <a href="${resetLink}" target="_blank">${resetLink}</a></p>`;
+
+        await sendEmail(email, subject, text, html);
+
+        res.status(200).json({ message: 'Password reset email sent' });
+    } catch (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
+
+// const resetPassword = async(req, res) => {
+//     try {
+//         const { token, newPassword } = req.body;
+
+//         const resetToken = await tokenService.findToken(token);
+//         if (!resetToken) {
+//             return res.status(400).json({ message: 'Invalid or expired token' });
+//         }
+
+//         const tokenLifetime = 3600000; // 1 hour in milliseconds
+//         if (Date.now() - resetToken.createdAt > tokenLifetime) {
+//             return res.status(400).json({ message: 'Token expired' });
+//         }
+
+//         const hashedPassword = await bcrypt.hash(newPassword, 10);
+//         const user = await userService.updateUser(resetToken.userId, {password:hashedPassword});
+//         if(!user){
+//             return res.status(404).json({message: "User not found"});
+//         }
+
+//         await tokenService.findTokenAndDelete(resetToken.id);
+//         res.status(200).json({ message: 'Password reset successful' });
+//     } catch (error) {
+//         console.error('Error resetting password:', error);
+//         res.status(500).json({ message: 'Internal Server Error', error: error.message });
+//     }
+// }
+
 
 module.exports= {
     createUser,
@@ -146,6 +203,8 @@ module.exports= {
     updateHoliday,
     getHoliday,
     sendVerificationEmail,
-    verifyEmail
+    verifyEmail,
+    forgotPassword,
+    resetPassword
 
 }
