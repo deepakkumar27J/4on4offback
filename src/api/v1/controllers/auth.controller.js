@@ -6,7 +6,7 @@ const loginUser = async(req,res) => {
     try {
         const { userName, password } = req.body;
         const user = await userService.getUserByEmail(userName);
-        console.log("user  ",user);
+        console.log("user  ",userName);
         if (!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(401).json({ message: "Invalid credentials" });
         }

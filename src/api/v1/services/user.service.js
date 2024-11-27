@@ -3,9 +3,12 @@ const bcrypt = require('bcryptjs');
 
 // basic CRUD
 const createUser = async(userData) =>{
-    let partsCurrent = userData.startDate.split('-');  // Split into day, month, and year
-    let formattedStartDate = `${partsCurrent[2]}-${partsCurrent[1]}-${partsCurrent[0]}`;  // Reformat to YYYY-MM-DD
-    userData.startDate =  new Date(formattedStartDate);
+    // console.log("date ", userData.startDate);
+    // if(userData.startDate) {
+    //     let partsCurrent = userData.startDate.split('-');  // Split into day, month, and year
+    //     let formattedStartDate = `${partsCurrent[2]}-${partsCurrent[1]}-${partsCurrent[0]}`;  // Reformat to YYYY-MM-DD
+    //     userData.startDate =  new Date(formattedStartDate);
+    // }
     userData.password = await bcrypt.hash(userData.password, 10);
     const user = new User(userData);
     return await user.save();

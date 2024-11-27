@@ -13,7 +13,7 @@ router.get('/holiday/:id',userController.getHoliday);
 router.post('/sendVerificationEmail', userController.sendVerificationEmail);
 router.post('/verifyEmail', userController.verifyEmail);
 router.post('/forgotPassword', userController.forgotPassword);
-// router.post('/resetPassword/:token', userController.resetPassword);
+router.post('/resetPassword/:token', userController.resetPassword);
 
 
 module.exports = router;

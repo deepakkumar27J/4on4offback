@@ -7,10 +7,12 @@ const bcrypt = require('bcryptjs');
 
 const createUser = async(req,res) => {
     try {
-        console.log("this is controller!");
+        console.log("this is controller!", req.body);
         const user = await userService.createUser(req.body);
+        console.log("usert ", user);
         res.status(201).json(user);
     } catch (error) {
+        console.log("eooe ", error);
         res.status(400).json({error: error.message});
     }
 }
@@ -164,33 +166,33 @@ const forgotPassword = async(req,res) => {
     }
 }
 
-// const resetPassword = async(req, res) => {
-//     try {
-//         const { token, newPassword } = req.body;
+const resetPassword = async(req, res) => {
+    try {
+        const { token, newPassword } = req.body;
 
-//         const resetToken = await tokenService.findToken(token);
-//         if (!resetToken) {
-//             return res.status(400).json({ message: 'Invalid or expired token' });
-//         }
+        const resetToken = await tokenService.findToken(token);
+        if (!resetToken) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
+        }
 
-//         const tokenLifetime = 3600000; // 1 hour in milliseconds
-//         if (Date.now() - resetToken.createdAt > tokenLifetime) {
-//             return res.status(400).json({ message: 'Token expired' });
-//         }
+        const tokenLifetime = 3600000; // 1 hour in milliseconds
+        if (Date.now() - resetToken.createdAt > tokenLifetime) {
+            return res.status(400).json({ message: 'Token expired' });
+        }
 
-//         const hashedPassword = await bcrypt.hash(newPassword, 10);
-//         const user = await userService.updateUser(resetToken.userId, {password:hashedPassword});
-//         if(!user){
-//             return res.status(404).json({message: "User not found"});
-//         }
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const user = await userService.updateUser(resetToken.userId, {password:hashedPassword});
+        if(!user){
+            return res.status(404).json({message: "User not found"});
+        }
 
-//         await tokenService.findTokenAndDelete(resetToken.id);
-//         res.status(200).json({ message: 'Password reset successful' });
-//     } catch (error) {
-//         console.error('Error resetting password:', error);
-//         res.status(500).json({ message: 'Internal Server Error', error: error.message });
-//     }
-// }
+        await tokenService.findTokenAndDelete(resetToken.id);
+        res.status(200).json({ message: 'Password reset successful' });
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+}
 
 
 module.exports= {
