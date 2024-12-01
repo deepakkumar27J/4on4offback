@@ -7,12 +7,9 @@ const bcrypt = require('bcryptjs');
 
 const createUser = async(req,res) => {
     try {
-        console.log("this is controller!", req.body);
         const user = await userService.createUser(req.body);
-        console.log("usert ", user);
         res.status(201).json(user);
     } catch (error) {
-        console.log("eooe ", error);
         res.status(400).json({error: error.message});
     }
 }
@@ -93,7 +90,6 @@ const getHoliday = async(req,res) => {
 //TO-DO
 const updateHoliday = async(req,res) => {
     try {
-        console.log("inside holiday update");
         res.json({message:"Holidays added successfully"});
     } catch (error) {
         res.status(400).json({error: error.message});
@@ -147,7 +143,6 @@ const forgotPassword = async(req,res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        console.log("user ", user._id);
         // Reset token
         const resetToken = crypto.randomBytes(32).toString('hex');
         await tokenService.createToken(user._id, resetToken)
