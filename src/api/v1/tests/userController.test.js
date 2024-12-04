@@ -65,4 +65,46 @@ describe('UserController', () => {
       expect(res.json).toHaveBeenCalledWith({ error: 'Invalid data' });
     });
   });
+
+  describe('getUserById', () => {
+    it('should return the user if found', async () => {
+      const mockUser = { id: '123', name: 'John Doe' };
+      userService.getUserById.mockResolvedValue(mockUser);
+
+      const req = mockRequest({}, { id: '123' });
+      const res = mockResponse();
+
+      await userController.getUserById(req, res);
+
+      expect(userService.getUserById).toHaveBeenCalledWith('123');
+      expect(res.status).not.toHaveBeenCalled(); // No status call for 200 by default
+      expect(res.json).toHaveBeenCalledWith(mockUser);
+    });
+
+    it('should return 404 if the user is not found', async () => {
+      userService.getUserById.mockResolvedValue(null);
+
+      const req = mockRequest({}, { id: '123' });
+      const res = mockResponse();
+
+      await userController.getUserById(req, res);
+
+      expect(userService.getUserById).toHaveBeenCalledWith('123');
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ message: 'User not found' });
+    });
+
+    it('should return 400 if there is an error', async () => {
+      userService.getUserById.mockRejectedValue(new Error('Database error'));
+
+      const req = mockRequest({}, { id: '123' });
+      const res = mockResponse();
+
+      await userController.getUserById(req, res);
+
+      expect(userService.getUserById).toHaveBeenCalledWith('123');
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Database error' });
+    });
+  });
 })
