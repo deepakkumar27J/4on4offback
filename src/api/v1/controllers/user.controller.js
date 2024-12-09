@@ -2,6 +2,7 @@ const userService = require('../services/user.service');
 const {sendEmail} = require('./../services/email.service');
 const Token = require('./../models/token.model');
 const tokenService = require('./../services/token.service');
+const { ResponseMessages } = require('../utils/enums');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 
@@ -18,7 +19,7 @@ const getUserById = async(req,res) => {
     try {
         const user = await userService.getUserById(req.params.id);
         if(!user){
-            return res.status(404).json({message: "User not found"});
+            return res.status(404).json({message: ResponseMessages.USER_NOT_FOUND});
         }
         res.json(user);
     } catch (error) {
@@ -126,10 +127,10 @@ const verifyEmail = async(req, res) => {
 
         const user = await userService.getUserByEmail( email );
         if (!user || user.verificationCode !== verificationCode) {
-        return res.status(400).json({ message: 'Invalid verification code.' });
+        return res.status(400).json({ message: ResponseMessages.INVALID_VERIFICATION_CODE });
         }
         await userService.verifyEmail(user);
-        res.status(200).json({ message: 'Email verified successfully.' });
+        res.status(200).json({ message: ResponseMessages.SUCCESS });
 
     } catch (error) {
         
