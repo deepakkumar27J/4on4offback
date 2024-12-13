@@ -80,7 +80,7 @@ const getHoliday = async(req,res) => {
     try {
         const holidays = await userService.getHoliday(req.body.id);
         if(!holidays){
-            return res.status(404).json({message: "User not found"});
+            return res.status(404).json({message: ResponseMessages.USER_NOT_FOUND});
         }
         res.json(holidays);
     } catch (error) {
@@ -91,7 +91,7 @@ const getHoliday = async(req,res) => {
 //TO-DO
 const updateHoliday = async(req,res) => {
     try {
-        res.json({message:"Holidays added successfully"});
+        res.json({message:ResponseMessages.SUCCESS});
     } catch (error) {
         res.status(400).json({error: error.message});
     }
@@ -102,7 +102,7 @@ const sendVerificationEmail = async(req, res) => {
         const {email} = req.body;
         const user = await userService.getUserByEmail( email );
         if (!user) {
-        return res.status(400).json({ message: 'User not found' });
+        return res.status(400).json({ message: ResponseMessages.USER_NOT_FOUND });
         }
         // Generate random verification code
         const verificationCode = crypto.randomBytes(3).toString('hex');
@@ -113,11 +113,11 @@ const sendVerificationEmail = async(req, res) => {
         const html = `<p>Your verification code is: <b>${verificationCode}</b></p>`;
 
         await sendEmail(email, subject, text, html);
-        res.status(200).json({ message: 'Verification email sent.' });
+        res.status(200).json({ message: ResponseMessages.SUCCESS });
 
     } catch (error) {
         console.error('Error in sendVerificationEmail:', error);
-        res.status(500).json({ message: 'Failed to send verification email.', error: error.message });
+        res.status(500).json({ message: ResponseMessages.FAILURE, error: error.message });
     }
 }
 
@@ -142,7 +142,7 @@ const forgotPassword = async(req,res) => {
         const { email } = req.body;
         const user = await userService.getUserByEmail(email);
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: ResponseMessages.USER_NOT_FOUND });
         }
         // Reset token
         const resetToken = crypto.randomBytes(32).toString('hex');
@@ -155,10 +155,10 @@ const forgotPassword = async(req,res) => {
 
         await sendEmail(email, subject, text, html);
 
-        res.status(200).json({ message: 'Password reset email sent' });
+        res.status(200).json({ message: ResponseMessages.SUCCESS });
     } catch (error) {
         console.error('Error sending email:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+        res.status(500).json({ message: ResponseMessages.FAILURE, error: error.message });
     }
 }
 
@@ -168,25 +168,25 @@ const resetPassword = async(req, res) => {
 
         const resetToken = await tokenService.findToken(token);
         if (!resetToken) {
-            return res.status(400).json({ message: 'Invalid or expired token' });
+            return res.status(400).json({ message: ResponseMessages.INVALID_TOKEN });
         }
 
         const tokenLifetime = 3600000; // 1 hour in milliseconds
         if (Date.now() - resetToken.createdAt > tokenLifetime) {
-            return res.status(400).json({ message: 'Token expired' });
+            return res.status(400).json({ message: ResponseMessages.TOKEN_EXPIRED });
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         const user = await userService.updateUser(resetToken.userId, {password:hashedPassword});
         if(!user){
-            return res.status(404).json({message: "User not found"});
+            return res.status(404).json({message: ResponseMessages.USER_NOT_FOUND});
         }
 
         await tokenService.findTokenAndDelete(resetToken.id);
-        res.status(200).json({ message: 'Password reset successful' });
+        res.status(200).json({ message: ResponseMessages.SUCCESS });
     } catch (error) {
         console.error('Error resetting password:', error);
-        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+        res.status(500).json({ message: ResponseMessages.FAILURE, error: error.message });
     }
 }
 
