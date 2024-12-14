@@ -31,11 +31,11 @@ const updateUser = async(req,res) => {
     try {
         const user = await userService.updateUser(req.params.id, req.body);
         if(!user){
-            return res.status(404).json({message: "User not found"});
+            return res.status(404).json({message: ResponseMessages.USER_NOT_FOUND});
         }
         res.json(user);
     } catch (error) {
-        res.status(400).json({error: error.message});
+        res.status(400).json({message: ResponseMessages.FAILURE, error: error.message});
     }
 }
 
@@ -43,11 +43,11 @@ const deleteUser = async(req,res) => {
     try {
         const user = await userService.deleteUser(req.params.id);
         if(!user){
-            return res.status(404).json({message: "User not found"});
+            return res.status(404).json({message: ResponseMessages.USER_NOT_FOUND});
         }
-        res.json({message:"User deleted successfully"});
+        res.json({message:ResponseMessages.SUCCESS});
     } catch (error) {
-        res.status(400).json({error: error.message});
+        res.status(400).json({message: ResponseMessages.FAILURE, error: error.message});
     }
 }
 
@@ -55,12 +55,12 @@ const getUserRota = async(req, res) => {
     try {
         const user = await userService.getUserById(req.params.userId);
         if(!user){
-            return res.status(404).json({message: "User not found"});
+            return res.status(404).json({message: ResponseMessages.USER_NOT_FOUND});
         }
         const rota = await userService.calculateRota(user.startDate, user.holidays, req.params.rangeStartDate, req.params.rangeEndDate);
         res.json(rota);
     } catch (error) {
-        res.status(400).json({error: error.message});
+        res.status(400).json({message: ResponseMessages.FAILURE, error: error.message});
     }
 }
 
@@ -68,11 +68,11 @@ const addHoliday = async(req,res) => {
     try {
         const user = await userService.addHoliday(req.body.id, req.body.holidays);
         if(!user){
-            return res.status(404).json({message: "User not found"});
+            return res.status(404).json({message: ResponseMessages.USER_NOT_FOUND});
         }
         res.json({message:"Holidays added successfully"});
     } catch (error) {
-        res.status(400).json({error: error.message});
+        res.status(400).json({message: ResponseMessages.FAILURE, error: error.message});
     }
 }
 
@@ -84,7 +84,7 @@ const getHoliday = async(req,res) => {
         }
         res.json(holidays);
     } catch (error) {
-        res.status(400).json({error: error.message});
+        res.status(400).json({message: ResponseMessages.FAILURE, error: error.message});
     }
 }
 
@@ -133,7 +133,8 @@ const verifyEmail = async(req, res) => {
         res.status(200).json({ message: ResponseMessages.SUCCESS });
 
     } catch (error) {
-        
+        console.error('Error in Verify Email:', error);
+        res.status(500).json({ message: ResponseMessages.FAILURE, error: error.message });
     }
 }
 
