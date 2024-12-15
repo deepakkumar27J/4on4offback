@@ -145,7 +145,6 @@ const forgotPassword = async(req,res) => {
         if (!user) {
             return res.status(404).json({ message: ResponseMessages.USER_NOT_FOUND });
         }
-        // Reset token
         const resetToken = crypto.randomBytes(32).toString('hex');
         await tokenService.createToken(user._id, resetToken)
 
@@ -172,7 +171,7 @@ const resetPassword = async(req, res) => {
             return res.status(400).json({ message: ResponseMessages.INVALID_TOKEN });
         }
 
-        const tokenLifetime = 3600000; // 1 hour in milliseconds
+        const tokenLifetime = 3600000;
         if (Date.now() - resetToken.createdAt > tokenLifetime) {
             return res.status(400).json({ message: ResponseMessages.TOKEN_EXPIRED });
         }
@@ -186,7 +185,7 @@ const resetPassword = async(req, res) => {
         await tokenService.findTokenAndDelete(resetToken.id);
         res.status(200).json({ message: ResponseMessages.SUCCESS });
     } catch (error) {
-        console.error('Error resetting password:', error);
+        console.error('Error resetting the password:', error);
         res.status(500).json({ message: ResponseMessages.FAILURE, error: error.message });
     }
 }
